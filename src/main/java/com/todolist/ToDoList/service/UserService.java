@@ -46,6 +46,12 @@ public class UserService {
     }
 
     public Optional<User> getUserById(Long id) {
+        if (id == null) {
+            throw new RuntimeException("User ID cannot be null");
+        }
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
         return userRepository.findById(id);
     }
 
@@ -60,6 +66,11 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public Optional<User> deleteUserById(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteUserById'");
     }
 
 }

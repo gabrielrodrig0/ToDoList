@@ -1,5 +1,6 @@
 package com.todolist.ToDoList.service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.todolist.ToDoList.dto.CreateUserDTO;
 import com.todolist.ToDoList.enums.Role;
@@ -12,6 +13,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public User createUser(CreateUserDTO createUserDTO) {
 
@@ -38,7 +42,7 @@ public class UserService {
         createUserDTO.setRole(createUserDTO.getRole() != null ? createUserDTO.getRole() : Role.USER); 
         User user = new User();
         user.setUsername(createUserDTO.getUsername());
-        user.setPassword(createUserDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
         user.setEmail(createUserDTO.getEmail());
         user.setRole(createUserDTO.getRole());
 

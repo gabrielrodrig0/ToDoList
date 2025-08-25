@@ -1,17 +1,29 @@
 package com.todolist.ToDoList.controller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.todolist.ToDoList.dto.CreateUserDTO;
+import com.todolist.ToDoList.dto.LoginRequestDTO;
+import com.todolist.ToDoList.dto.LoginResponseDTO;
+import com.todolist.ToDoList.service.JwtService;
 import com.todolist.ToDoList.service.UserService;
 
 @RestController
 public class AuthController {
+
+    @Autowired
+    AuthenticationManager authManager;
     
     @Autowired
     UserService userService;
+
+    @Autowired
+    JwtService jwtService;
     
     @PostMapping("/auth/register")
     public ResponseEntity<?> register(@RequestBody CreateUserDTO createUserDTO) {
@@ -22,6 +34,18 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginDTO) {
+        
+        Authentication auth = (Authentication) authManager.authenticate(
+        new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
+        
+        String token = jwtService.generateToken(auth.getName());
+
+        return ResponseEntity.ok(new LoginResponseDTO(token));
+    }
+
     
 
 }
+

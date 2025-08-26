@@ -2,6 +2,7 @@ package com.todolist.ToDoList.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.todolist.ToDoList.enums.Role;
 
 import jakarta.persistence.CascadeType;
@@ -39,6 +40,7 @@ public class User {
     @Column(name = "role")
     private Role role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
 }

@@ -1,47 +1,49 @@
 package com.todolist.ToDoList.service;
-import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
+import java.security.Key;
 import java.util.Date;
 
-@Service
+@Component
 public class JwtService {
-    // Chave secreta usada para assinar o token (não deixar hardcoded em produção)
-    private static final String SECRET_KEY = "minhaChaveSuperSecreta123minhaChaveSuperSecreta123"; // 32+ chars
 
-    // Expiração do token (ex: 1 hora)
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
+    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // chave secreta
+    private final long expiration = 1000 * 60 * 60 * 24; // 24h
 
-    // Gera o token a partir do username
-    public String generateToken(String username) {
+    // Gera token com ID do usuário
+    public String generateToken(Long userId) {
         return Jwts.builder()
-                .setSubject(username) // claim "sub"
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256) // <-- aqui!
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key)
                 .compact();
     }
 
-    // Valida se o token está correto e não expirou
+    // Extrai ID do token
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Long.parseLong(claims.getSubject());
+    }
+
+    // Valida token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
-    }
-
-    // Extrai o username do token
-    public String extractUsername(String token) {
-        Claims claims = Jwts.parser()
-                            .setSigningKey(SECRET_KEY)
-                            .parseClaimsJws(token)
-                            .getBody();
-        return claims.getSubject();
     }
 }

@@ -1,6 +1,9 @@
 package com.todolist.ToDoList.model;
+import com.todolist.ToDoList.enums.Priority;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +29,10 @@ public class Task {
 
     @Column(name = "status")
     private boolean status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority")
+    private Priority priority;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

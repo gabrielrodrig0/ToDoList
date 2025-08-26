@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.todolist.ToDoList.dto.CreateUserDTO;
 import com.todolist.ToDoList.dto.LoginRequestDTO;
 import com.todolist.ToDoList.dto.LoginResponseDTO;
+import com.todolist.ToDoList.model.CustomUserDetails;
 import com.todolist.ToDoList.service.JwtService;
 import com.todolist.ToDoList.service.UserService;
 
@@ -39,8 +40,12 @@ public class AuthController {
         
         Authentication auth = (Authentication) authManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
-        
-        String token = jwtService.generateToken(auth.getName());
+
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        // Pega o ID do usuário
+        Long userId = userDetails.getId(); 
+        // Gera token pelo ID
+        String token = jwtService.generateToken(userId);
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
